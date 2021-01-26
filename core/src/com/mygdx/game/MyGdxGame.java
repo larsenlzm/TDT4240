@@ -13,12 +13,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
-
-import java.awt.Rectangle;
-import java.lang.reflect.Array;
-import java.util.Iterator;
 
 public class MyGdxGame extends ApplicationAdapter {
 
@@ -56,9 +53,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			helicopter = new Polygon(new float[]{0,0,HELI_WIDTH, 0, HELI_WIDTH, HELI_HEIGTH, 0, HELI_HEIGTH});
 			bounding_walls = new Polygon(new float[]{0,0,SCREEN_WIDTH, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, SCREEN_HEIGHT});
 
-			helicopter.setOrigin((float)HELI_WIDTH/2, (float)HELI_HEIGTH/2);
-
-			helicopter.setPosition( SCREEN_WIDTH/2 , SCREEN_HEIGHT/2);
+			helicopter.setOrigin(HELI_WIDTH/2,HELI_HEIGTH/2);
+			helicopter.setPosition( SCREEN_WIDTH/2 - HELI_WIDTH/2 , SCREEN_HEIGHT/2 - HELI_HEIGTH);
 
 			heli_speedX = 0;
 			heli_speedY = 0;
@@ -79,7 +75,6 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			helicopter.setRotation(heli_rotation);
 
-			/*
 			batch.begin();
 
 			helicopterSprite.draw(batch);
@@ -87,6 +82,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			helicopterSprite.setRotation(180+heli_rotation);
 
 			batch.end();
+
 			/*
 			if(helicopter.getX() < 0) {
 				heli_speedX = 200;
@@ -107,15 +103,14 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			//helicopter.translate(heli_speedX * Gdx.graphics.getDeltaTime(), heli_speedY * Gdx.graphics.getDeltaTime());
 
-			helicopter.translate((float) Math.cos(heli_rotation*(Math.PI/180)), (float) Math.sin(heli_rotation*(Math.PI/180)));
+			helicopter.translate((float) Math.cos(Math.toRadians(heli_rotation)), (float) Math.sin(Math.toRadians(heli_rotation)));
 
 			if(Gdx.input.isTouched()) {
-				Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 
-				heli_rotation = 180 + (float) (Math.atan2((touchPos.y - helicopter.getY() - (float)HELI_HEIGTH/2), -(touchPos.x - helicopter.getX() - (float)HELI_WIDTH/2)) * 180 / Math.PI);
+				Vector2 touchPos = new Vector2(Math.abs(Gdx.input.getX() ), Math.abs(Gdx.input.getY() - 800));
 
-				System.out.println("klikket på : " + touchPos.x + ", " + touchPos.y);
-				System.out.println("Angle: " + heli_rotation + ", origin:" + helicopter.getX() + ", " + helicopter.getY());
+				heli_rotation = 180 + (float) (Math.atan2(-(touchPos.y - Math.abs(helicopter.getY()) - helicopter.getOriginY()),-(touchPos.x - Math.abs(helicopter.getX())- helicopter.getOriginX()))*180/Math.PI);
+
 			}
 		}
 
