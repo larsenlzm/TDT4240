@@ -3,6 +3,7 @@ package com.mygdx.game;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -52,13 +53,13 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			helicopter.setOrigin((float)HELI_WIDTH/2, (float)HELI_HEIGTH/2);
 
-			helicopter.setPosition( SCREEN_WIDTH/2 , SCREEN_HEIGHT/2);
+			helicopter.setPosition( (float) (SCREEN_WIDTH-(HELI_WIDTH*1.5)) , SCREEN_HEIGHT/2);
 
 			heli_speedX = 0;
-			heli_speedY = 200;
+			heli_speedY = 0;
 
 			helicopterSprite = new Sprite(helicopterTexture);
-			heli_rotation = 270f;
+			heli_rotation = 0f;
 			//updateRotation();
 		}
 
@@ -71,13 +72,12 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			helicopterSprite.draw(batch);
 			helicopterSprite.setPosition(helicopter.getX(),helicopter.getY());
-			helicopterSprite.setRotation(heli_rotation);
+			helicopterSprite.setRotation(180+heli_rotation);
 
 			batch.end();
 
-			System.out.println("X: " + helicopter.getX() + ", Y:" +helicopter.getY());
 
-			if(helicopter.getX() < 0) {
+			/*if(helicopter.getX() < 0) {
 				heli_speedX = 200;
 				heli_rotation = 180f;
 			}
@@ -92,16 +92,22 @@ public class MyGdxGame extends ApplicationAdapter {
 			else if(helicopter.getY() > SCREEN_HEIGHT - HELI_HEIGTH) {
 				heli_speedY = -200;
 				heli_rotation = 90f;
+			}*/
+
+
+			//helicopter.translate(heli_speedX * Gdx.graphics.getDeltaTime(), heli_speedY * Gdx.graphics.getDeltaTime());
+
+			helicopter.translate((float) Math.cos(heli_rotation*(Math.PI/180)), (float) Math.sin(heli_rotation*(Math.PI/180)));
+
+			if(Gdx.input.isTouched()) {
+				Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+
+				heli_rotation = 180 + (float) (Math.atan2((touchPos.y - helicopter.getY()), - (touchPos.x - helicopter.getX())) * 180 / Math.PI);
+
+				System.out.println("Angle: " + heli_rotation + ", origin:" + helicopter.getX() + ", " + helicopter.getY());
 			}
-
-
-			helicopter.translate(heli_speedX * Gdx.graphics.getDeltaTime(), heli_speedY * Gdx.graphics.getDeltaTime());
 		}
 
-		/*public void updateRotation(){
-			heli_rotation = (float)(Math.acos( heli_speedX / Math.sqrt(heli_speedY*heli_speedY + heli_speedX*heli_speedX)) * 180 / Math.PI);
-		}
-		 */
 
 		@Override
 		public void dispose() {
