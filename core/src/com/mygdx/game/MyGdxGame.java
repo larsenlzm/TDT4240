@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -21,7 +23,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	//Helicopter stuff
 	private Texture helicopterTexture;
 	private Sprite helicopterSprite;
-	private Rectangle helicopter;
+	private Polygon helicopter;
 	private float heli_speedX;
 	private float heli_speedY;
 	private float heli_rotation;
@@ -30,6 +32,7 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	//Game shit
 	private SpriteBatch batch;
+	private Polygon bounding_walls;
 	private int SCREEN_HEIGHT;
 	private int SCREEN_WIDTH;
 
@@ -44,16 +47,19 @@ public class MyGdxGame extends ApplicationAdapter {
 			HELI_WIDTH = helicopterTexture.getWidth();
 			HELI_HEIGTH = helicopterTexture.getHeight();
 
-			helicopter = new Rectangle();
-			helicopter.x = SCREEN_WIDTH - HELI_WIDTH;
-			helicopter.y = SCREEN_HEIGHT - HELI_HEIGTH;
-			helicopter.width = HELI_WIDTH;
-			helicopter.height = HELI_HEIGTH;
-			heli_speedX = 100;
+			helicopter = new Polygon(new float[]{0,0,HELI_WIDTH, 0, HELI_WIDTH, HELI_HEIGTH, 0, HELI_HEIGTH});
+			bounding_walls = new Polygon(new float[]{0,0,SCREEN_WIDTH, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, SCREEN_HEIGHT});
+
+			helicopter.setOrigin((float)HELI_WIDTH/2, (float)HELI_HEIGTH/2);
+
+			helicopter.setPosition( SCREEN_WIDTH/2 , SCREEN_HEIGHT/2);
+
+			heli_speedX = 0;
 			heli_speedY = 200;
 
 			helicopterSprite = new Sprite(helicopterTexture);
-			updateRotation();
+			heli_rotation = 270f;
+			//updateRotation();
 		}
 
 		@Override
@@ -64,38 +70,38 @@ public class MyGdxGame extends ApplicationAdapter {
 			batch.begin();
 
 			helicopterSprite.draw(batch);
-			helicopterSprite.setPosition(helicopter.x,helicopter.y);
-
+			helicopterSprite.setPosition(helicopter.getX(),helicopter.getY());
 			helicopterSprite.setRotation(heli_rotation);
 
 			batch.end();
 
-			if(helicopter.x < 0) {
+			System.out.println("X: " + helicopter.getX() + ", Y:" +helicopter.getY());
+
+			if(helicopter.getX() < 0) {
 				heli_speedX = 200;
-				updateRotation();
+				heli_rotation = 180f;
 			}
-			else if (helicopter.x > SCREEN_WIDTH - HELI_WIDTH) {
+			else if (helicopter.getX() > SCREEN_WIDTH - HELI_WIDTH) {
 				heli_speedX = -200;
-				updateRotation();
+				heli_rotation = 0f;
 			}
-			else if(helicopter.y < 0) {
+			else if(helicopter.getY() < 0) {
 				heli_speedY = 200;
-				updateRotation();
+				heli_rotation = 270f;
 			}
-			else if(helicopter.y > SCREEN_HEIGHT - HELI_HEIGTH) {
+			else if(helicopter.getY() > SCREEN_HEIGHT - HELI_HEIGTH) {
 				heli_speedY = -200;
-				updateRotation();
+				heli_rotation = 90f;
 			}
 
-			helicopter.x += heli_speedX * Gdx.graphics.getDeltaTime();
-			helicopter.y += heli_speedY * Gdx.graphics.getDeltaTime();
 
-
+			helicopter.translate(heli_speedX * Gdx.graphics.getDeltaTime(), heli_speedY * Gdx.graphics.getDeltaTime());
 		}
 
-		public void updateRotation(){
+		/*public void updateRotation(){
 			heli_rotation = (float)(Math.acos( heli_speedX / Math.sqrt(heli_speedY*heli_speedY + heli_speedX*heli_speedX)) * 180 / Math.PI);
 		}
+		 */
 
 		@Override
 		public void dispose() {
