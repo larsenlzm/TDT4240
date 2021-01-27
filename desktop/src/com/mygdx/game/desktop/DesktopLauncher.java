@@ -8,8 +8,8 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Helipeli";
-		config.height =800;
-		config.width =480;
+		config.height = 400;
+		config.width = 800;
 		new LwjglApplication(new MyGdxGame(), config);
 	}
 }
