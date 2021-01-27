@@ -78,38 +78,25 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			String coordinatesString = "x: " + Float.toString(helicopter.getX()) + " y: " + Float.toString(helicopter.getY());
 
+			/* For debugging
 			shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 			shapeRenderer.polygon(helicopter.getTransformedVertices());
 			shapeRenderer.end();
+			 */
 
 			helicopter.setRotation(heli_rotation);
 
 			batch.begin();
 
-			font.draw(batch, coordinatesString, 10, 790);
+			font.draw(batch, coordinatesString, 10, SCREEN_HEIGHT - 10);
 
 			helicopterSprite.draw(batch);
 			helicopterSprite.setPosition(helicopter.getX(),helicopter.getY());
 			helicopterSprite.setRotation(180+heli_rotation);
 
 			batch.end();
-/*
 
-
-			if(helicopter.getX() < 0) {
-				heli_rotation = 45f;
-			}
-			else if (helicopter.getX() > SCREEN_WIDTH - HELI_WIDTH) {
-				heli_rotation += 45f;
-			}
-			else if(helicopter.getY() < 0) {
-				heli_rotation += 45f;
-			}
-			else if(helicopter.getY() > SCREEN_HEIGHT - HELI_HEIGTH) {
-				heli_rotation += 45f;
-			}
-*/
-			float speed = 25f;
+			float speed = 4f;
 			float pushSpeed = speed*3;
 
 			float[] heli_vertices = helicopter.getTransformedVertices();
