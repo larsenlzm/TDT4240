@@ -20,33 +20,19 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MyGdxGame extends ApplicationAdapter {
 
-	//Helicopter stuff
-	private Polygon helicopter;
-	private float heli_speed;
-	private float heli_rotation;
-	private int HELI_HEIGTH;
-	private int HELI_WIDTH;
-	private boolean hasRotatedAfterCollision;
-	private boolean isColliding;
-	private int FRAMES;
-
 	//Animation
-
-	private Texture[] helicopterTextures;
-	private Animation<Texture> helicopterAnimation;
-	private Sprite helicopterSprite;
 
 	//Game stuff
 	private SpriteBatch batch;
-	private Polygon bounding_walls;
-	private int SCREEN_HEIGHT;
-	private int SCREEN_WIDTH;
+	private ArrayList<Helicopter> helis = new ArrayList<>();
+	private float SCREEN_HEIGHT;
+	private float SCREEN_WIDTH;
 	private ShapeRenderer shapeRenderer;
-	private BitmapFont font;
 	private float stateTime;
 
 
@@ -54,117 +40,100 @@ public class MyGdxGame extends ApplicationAdapter {
 		public void create() {
 			SCREEN_WIDTH = Gdx.graphics.getWidth();
 			SCREEN_HEIGHT = Gdx.graphics.getHeight();
-			FRAMES = 4;
 
 			shapeRenderer = new ShapeRenderer();
-
 			batch = new SpriteBatch();
-			font = new BitmapFont();
+			int amtCopters = 6;
+			float splitX = SCREEN_WIDTH/amtCopters;
+			float splitY = SCREEN_HEIGHT/amtCopters;
 
-			helicopterTextures = new Texture[FRAMES];
-			int index = 1;
-			for(int i=0;i<FRAMES;i++){
-				helicopterTextures[i] = new Texture(Gdx.files.internal("heli"+ index +".png"));
-				index++;
+			for (int i = 0; i < amtCopters; i++) {
+				helis.add(new Helicopter(SCREEN_WIDTH, SCREEN_HEIGHT, splitX*(i+1)-100, splitY*(i+1)-100));
 			}
+		}
 
-			helicopterAnimation = new Animation<Texture>(0.1f, helicopterTextures);
+		private void checkRotation(Helicopter heli) {
+			float pushSpeed = 10;
 
-			HELI_WIDTH = helicopterTextures[0].getWidth();
-			HELI_HEIGTH = helicopterTextures[0].getHeight();
+			float[] heli_vertices = heli.getHelicopter().getTransformedVertices();
 
-
-			helicopter = new Polygon(new float[]{0,0,HELI_WIDTH, 0, HELI_WIDTH, HELI_HEIGTH, 0, HELI_HEIGTH});
-			bounding_walls = new Polygon(new float[]{0,0,SCREEN_WIDTH, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, SCREEN_HEIGHT});
-			hasRotatedAfterCollision = false;
-			isColliding = false;
-
-			helicopter.setOrigin(HELI_WIDTH/2,HELI_HEIGTH/2);
-			helicopter.setPosition( SCREEN_WIDTH/2 - HELI_WIDTH/2 , SCREEN_HEIGHT/2 - HELI_HEIGTH);
-
-			heli_speed = 3;
-
-			heli_rotation = (float)Math.random()*360;
-			helicopterSprite = new Sprite(helicopterTextures[0]);
+			//This is very ugly
+			for (int i = 0; i < heli_vertices.length; i++) {
+				if (i%2 == 0) {
+					if (heli_vertices[i] > SCREEN_WIDTH || heli_vertices[i] < 0) {
+						heli.setColliding(true);
+						float heli_rotation = heli.getHeli_rotation();
+						heli.getHelicopter().translate( -(float) Math.cos(Math.toRadians(heli_rotation)) * pushSpeed,
+														-(float) Math.sin(Math.toRadians(heli_rotation)) * pushSpeed);
+						heli.setHeli_rotation(180-heli_rotation);
+						break;
+					}
+				} else {
+					if (heli_vertices[i] > SCREEN_HEIGHT || heli_vertices[i] < 0) {
+						heli.setColliding(true);
+						float heli_rotation = heli.getHeli_rotation();
+						heli.getHelicopter().translate( -(float) Math.cos(Math.toRadians(heli_rotation)) * pushSpeed,
+														-(float) Math.sin(Math.toRadians(heli_rotation)) * pushSpeed);
+						heli.setHeli_rotation(360-heli_rotation);
+						break;
+					}
+				}
+			}
 		}
 
 		@Override
 		public void render() {
 			Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
 			stateTime += Gdx.graphics.getDeltaTime();
 
-			helicopterSprite.setTexture(helicopterAnimation.getKeyFrame(stateTime, true));
+			for (Helicopter heli : helis) {
+				heli.getHelicopterSprite().setTexture(heli.getHelicopterAnimation().getKeyFrame(stateTime, true));
+			}
 
-			String coordinatesString = "x: " + Float.toString(helicopter.getX()) + " y: " + Float.toString(helicopter.getY());
 
+			/*
 			shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 			shapeRenderer.polygon(helicopter.getTransformedVertices());
 			shapeRenderer.end();
-
-			helicopter.setRotation(heli_rotation);
+			*/
 
 			batch.begin();
 
-			font.draw(batch, coordinatesString, 10, SCREEN_HEIGHT-10);
-
-			helicopterSprite.draw(batch);
-			helicopterSprite.setPosition(helicopter.getX(),helicopter.getY());
-			helicopterSprite.setRotation(180+heli_rotation);
+			for (Helicopter heli : helis) {
+				heli.getHelicopterSprite().draw(batch);
+				heli.getHelicopterSprite().setPosition(heli.getHelicopter().getX(), heli.getHelicopter().getY());
+				heli.getHelicopterSprite().setRotation(180+heli.getHeli_rotation());
+			}
 
 			batch.end();
 
-			/*
-			if(helicopter.getX() < 0) {
-				heli_rotation = 45f;
+			for (Helicopter heli : helis) {
+				heli.setColliding(false);
+				checkRotation(heli);
 			}
-			else if (helicopter.getX() > SCREEN_WIDTH - HELI_WIDTH) {
-				heli_rotation += 45f;
-			}
-			else if(helicopter.getY() < 0) {
-				heli_rotation += 45f;
-			}
-			else if(helicopter.getY() > SCREEN_HEIGHT - HELI_HEIGTH) {
-				heli_rotation += 45f;
-			}
-			*/
 
-			float speed = 5f;
-			float pushSpeed = speed*3;
-
-			float[] heli_vertices = helicopter.getTransformedVertices();
-
-			//This is very ugly
-			for (int i = 0; i < heli_vertices.length; i++) {
-				if (i%2 == 0) {
-					if (heli_vertices[i] > SCREEN_WIDTH || heli_vertices[i] < 0) {
-						System.out.println("Horizontal collision");
-						isColliding = true;
-						helicopter.translate(-(float) Math.cos(Math.toRadians(heli_rotation)) * pushSpeed, -(float) Math.sin(Math.toRadians(heli_rotation)) * pushSpeed);
-						heli_rotation = 180 - heli_rotation;
-						break;
-					}
-				} else {
-					if (heli_vertices[i] > SCREEN_HEIGHT || heli_vertices[i] < 0) {
-						System.out.println("Vertical collision, vertex: " + heli_vertices[0]);
-						isColliding = true;
-						helicopter.translate(-(float) Math.cos(Math.toRadians(heli_rotation)) * pushSpeed, -(float) Math.sin(Math.toRadians(heli_rotation)) * pushSpeed);
-						heli_rotation = 360 - heli_rotation;
-						break;
+			for (int i = 0; i < helis.size(); i++) {
+				Helicopter currHeli = helis.get(i);
+				for (int j = i+1; j < helis.size(); j++) {
+					Helicopter otherHeli = helis.get(j);
+					if (Intersector.overlapConvexPolygons(currHeli.getHelicopter(), otherHeli.getHelicopter())) {
+						currHeli.setHeli_rotation(currHeli.getHeli_rotation()-180);
+						otherHeli.setHeli_rotation(otherHeli.getHeli_rotation()-180);
 					}
 				}
 			}
 
-
-			helicopter.translate((float) Math.cos(Math.toRadians(heli_rotation))*speed, (float) Math.sin(Math.toRadians(heli_rotation))*speed);
-			isColliding = false;
-
-			if(Gdx.input.isTouched()) {
-
-				Vector2 touchPos = new Vector2(Math.abs(Gdx.input.getX() ), Math.abs(Gdx.input.getY() - SCREEN_HEIGHT));
-
-				heli_rotation = 180 + (float) (Math.atan2(-(touchPos.y - Math.abs(helicopter.getY()) - helicopter.getOriginY()),-(touchPos.x - Math.abs(helicopter.getX())- helicopter.getOriginX()))*180/Math.PI);
-
+			for (Helicopter heli : helis) {
+				if (!heli.isColliding()) {
+					float heli_rotation = heli.getHeli_rotation();
+					heli.getHelicopter()
+							.translate(
+									(float) Math.cos(Math.toRadians(heli_rotation)) * heli.getHeli_speed(),
+									(float) Math.sin(Math.toRadians(heli_rotation)) * heli.getHeli_speed());
+					heli.setColliding(false);
+				}
 			}
 		}
 
@@ -172,7 +141,11 @@ public class MyGdxGame extends ApplicationAdapter {
 		@Override
 		public void dispose() {
 			shapeRenderer.dispose();
-			font.dispose();
+			for (Helicopter heli : helis) {
+				for(Texture texture : heli.getHelicopterTextures()){
+					texture.dispose();
+				}
+			}
 			batch.dispose();
 		}
 	}
