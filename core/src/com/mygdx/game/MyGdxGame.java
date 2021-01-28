@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -29,7 +30,8 @@ public class MyGdxGame extends ApplicationAdapter {
 
 	//Game stuff
 	private SpriteBatch batch;
-	private ArrayList<Helicopter> helis = new ArrayList<>();
+	private ArrayList<Helicopter> helis;
+	private ArrayList<Paddle> paddles;
 	private float SCREEN_HEIGHT;
 	private float SCREEN_WIDTH;
 	private ShapeRenderer shapeRenderer;
@@ -41,6 +43,8 @@ public class MyGdxGame extends ApplicationAdapter {
 			SCREEN_WIDTH = Gdx.graphics.getWidth();
 			SCREEN_HEIGHT = Gdx.graphics.getHeight();
 
+			helis = new ArrayList<>();
+			paddles = new ArrayList<>();
 			shapeRenderer = new ShapeRenderer();
 			batch = new SpriteBatch();
 			int amtCopters = 6;
@@ -50,6 +54,10 @@ public class MyGdxGame extends ApplicationAdapter {
 			for (int i = 0; i < amtCopters; i++) {
 				helis.add(new Helicopter(SCREEN_WIDTH, SCREEN_HEIGHT, splitX*(i+1)-100, splitY*(i+1)-100));
 			}
+
+			paddles.add(new Paddle(100, 10, 10, SCREEN_HEIGHT/2));
+			paddles.add(new Paddle(100, 10, SCREEN_WIDTH-20, SCREEN_HEIGHT/2));
+
 		}
 
 		private void checkRotation(Helicopter heli) {
@@ -93,11 +101,14 @@ public class MyGdxGame extends ApplicationAdapter {
 			}
 
 
-			/*
 			shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-			shapeRenderer.polygon(helicopter.getTransformedVertices());
+			for (Paddle paddle : paddles) {
+				shapeRenderer.polygon(paddle.getTransformedVertices());
+			}
+
+			//shapeRenderer.polygon(helicopter.getTransformedVertices());
 			shapeRenderer.end();
-			*/
+
 
 			batch.begin();
 
