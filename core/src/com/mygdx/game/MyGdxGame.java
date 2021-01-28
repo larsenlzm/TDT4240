@@ -7,9 +7,11 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Polygon;
@@ -23,8 +25,6 @@ import java.util.Arrays;
 public class MyGdxGame extends ApplicationAdapter {
 
 	//Helicopter stuff
-	private Texture helicopterTexture;
-	private Sprite helicopterSprite;
 	private Polygon helicopter;
 	private float heli_speed;
 	private float heli_rotation;
@@ -32,6 +32,13 @@ public class MyGdxGame extends ApplicationAdapter {
 	private int HELI_WIDTH;
 	private boolean hasRotatedAfterCollision;
 	private boolean isColliding;
+	private int FRAMES;
+
+	//Animation
+
+	private Texture[] helicopterTextures;
+	private Animation<Texture> helicopterAnimation;
+	private Sprite helicopterSprite;
 
 	//Game stuff
 	private SpriteBatch batch;
@@ -40,21 +47,31 @@ public class MyGdxGame extends ApplicationAdapter {
 	private int SCREEN_WIDTH;
 	private ShapeRenderer shapeRenderer;
 	private BitmapFont font;
+	private float stateTime;
 
 
 		@Override
 		public void create() {
 			SCREEN_WIDTH = Gdx.graphics.getWidth();
 			SCREEN_HEIGHT = Gdx.graphics.getHeight();
+			FRAMES = 4;
 
 			shapeRenderer = new ShapeRenderer();
 
 			batch = new SpriteBatch();
 			font = new BitmapFont();
 
-			helicopterTexture = new Texture(Gdx.files.internal("attackhelicopter.png"));
-			HELI_WIDTH = helicopterTexture.getWidth();
-			HELI_HEIGTH = helicopterTexture.getHeight();
+			helicopterTextures = new Texture[FRAMES];
+			int index = 1;
+			for(int i=0;i<FRAMES;i++){
+				helicopterTextures[i] = new Texture(Gdx.files.internal("heli"+ index +".png"));
+				index++;
+			}
+
+			helicopterAnimation = new Animation<Texture>(0.1f, helicopterTextures);
+
+			HELI_WIDTH = helicopterTextures[0].getWidth();
+			HELI_HEIGTH = helicopterTextures[0].getHeight();
 
 
 			helicopter = new Polygon(new float[]{0,0,HELI_WIDTH, 0, HELI_WIDTH, HELI_HEIGTH, 0, HELI_HEIGTH});
@@ -67,14 +84,17 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			heli_speed = 3;
 
-			helicopterSprite = new Sprite(helicopterTexture);
 			heli_rotation = (float)Math.random()*360;
+			helicopterSprite = new Sprite(helicopterTextures[0]);
 		}
 
 		@Override
 		public void render() {
 			Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+			stateTime += Gdx.graphics.getDeltaTime();
+
+			helicopterSprite.setTexture(helicopterAnimation.getKeyFrame(stateTime, true));
 
 			String coordinatesString = "x: " + Float.toString(helicopter.getX()) + " y: " + Float.toString(helicopter.getY());
 
@@ -86,16 +106,15 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			batch.begin();
 
-			font.draw(batch, coordinatesString, 10, 790);
+			font.draw(batch, coordinatesString, 10, SCREEN_HEIGHT-10);
 
 			helicopterSprite.draw(batch);
 			helicopterSprite.setPosition(helicopter.getX(),helicopter.getY());
 			helicopterSprite.setRotation(180+heli_rotation);
 
 			batch.end();
-/*
 
-
+			/*
 			if(helicopter.getX() < 0) {
 				heli_rotation = 45f;
 			}
@@ -108,8 +127,9 @@ public class MyGdxGame extends ApplicationAdapter {
 			else if(helicopter.getY() > SCREEN_HEIGHT - HELI_HEIGTH) {
 				heli_rotation += 45f;
 			}
-*/
-			float speed = 25f;
+			*/
+
+			float speed = 5f;
 			float pushSpeed = speed*3;
 
 			float[] heli_vertices = helicopter.getTransformedVertices();
@@ -153,7 +173,6 @@ public class MyGdxGame extends ApplicationAdapter {
 		public void dispose() {
 			shapeRenderer.dispose();
 			font.dispose();
-			helicopterTexture.dispose();
 			batch.dispose();
 		}
 	}
