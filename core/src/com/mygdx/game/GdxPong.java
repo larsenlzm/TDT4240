@@ -30,18 +30,22 @@ public class GdxPong extends ApplicationAdapter {
     private ArrayList<Paddle> paddles;
     private ArrayList<Wall> walls;
     private ArrayList<Polygon> polygons;
+    private Player p1;
+    private Player p2;
     private Ball ball;
     private ShapeRenderer shapeRenderer;
-    private float stateTime;
-
+    private BitmapFont font;
+    private float SCREEN_WIDTH;
+    private float SCREEN_HEIGHT;
 
     @Override
     public void create() {
-        float SCREEN_WIDTH = Gdx.graphics.getWidth();
-        float SCREEN_HEIGHT = Gdx.graphics.getHeight();
+        SCREEN_WIDTH = Gdx.graphics.getWidth();
+        SCREEN_HEIGHT = Gdx.graphics.getHeight();
 
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
+        font = new BitmapFont();
 
         paddles = new ArrayList<>();
         walls = new ArrayList<>();
@@ -58,6 +62,19 @@ public class GdxPong extends ApplicationAdapter {
 
         polygons.addAll(paddles);
         polygons.addAll(walls);
+
+        p1 = new Player(paddles.get(0), Input.Keys.W, Input.Keys.S);
+        p2 = new Player(paddles.get(1), Input.Keys.UP, Input.Keys.DOWN);
+    }
+
+    public int getScoreState() {
+        if (ball.x > SCREEN_WIDTH){
+            return 1;
+        } else if (ball.x < 0) {
+            return 2;
+        } else {
+            return 0;
+        }
     }
 
     @Override
@@ -65,14 +82,17 @@ public class GdxPong extends ApplicationAdapter {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        stateTime += Gdx.graphics.getDeltaTime();
-
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         for (Polygon object : polygons) {
             shapeRenderer.polygon(object.getTransformedVertices());
         }
         shapeRenderer.circle(ball.x, ball.y, ball.radius);
         shapeRenderer.end();
+
+        batch.begin();
+        font.draw(batch, ""+p1.getScore(), (SCREEN_WIDTH/2)-50, SCREEN_HEIGHT-50);
+        font.draw(batch, ""+p2.getScore(), (SCREEN_WIDTH/2)+50, SCREEN_HEIGHT-50);
+        batch.end();
 
         //Horribelt, jeg spyr, men det funker enn så lenge
         if(Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -88,6 +108,21 @@ public class GdxPong extends ApplicationAdapter {
             paddles.get(1).move(0,-200 * Gdx.graphics.getDeltaTime());
         }
 
+        //:nauseated_face:
+        switch (getScoreState()) {
+            case 1:
+                p1.setScore(p1.getScore()+1);
+                ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10);
+                break;
+            case 2:
+                p2.setScore(p2.getScore()+1);
+                ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10);
+                break;
+            default:
+                break;
+
+        }
+
         //Ball til paddle/vegg kollisjon, flipper x eller y speed
         for (Polygon poly : polygons) {
             if (ball.isCollidingWithPolygon(poly)) {
@@ -100,13 +135,6 @@ public class GdxPong extends ApplicationAdapter {
         }
         ball.set(ball.x+(ball.getxSpeed()*Gdx.graphics.getDeltaTime()), ball.y+(ball.getySpeed()*Gdx.graphics.getDeltaTime()), ball.radius);
 
-        /* For sprites, trenger ikke afaik
-        batch.begin();
-
-
-        batch.end();
-        */
-
 
     }
 
@@ -114,7 +142,7 @@ public class GdxPong extends ApplicationAdapter {
     @Override
     public void dispose() {
         shapeRenderer.dispose();
-
+        font.dispose();
         batch.dispose();
     }
 }
