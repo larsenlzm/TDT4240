@@ -27,7 +27,8 @@ import java.util.Arrays;
 public class GdxPong extends ApplicationAdapter {
     //Game stuff
     private SpriteBatch batch;
-    private ArrayList<Paddle> paddles;
+    private Paddle paddle1;
+    private Paddle paddle2;
     private ArrayList<Wall> walls;
     private ArrayList<Polygon> polygons;
     private Player p1;
@@ -47,24 +48,24 @@ public class GdxPong extends ApplicationAdapter {
         batch = new SpriteBatch();
         font = new BitmapFont();
 
-        paddles = new ArrayList<>();
         walls = new ArrayList<>();
         polygons = new ArrayList<>();
 
-        ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10);
+        ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10, 200);
 
-        paddles.add(new Paddle(100, 10, 10, SCREEN_HEIGHT /2));
-        paddles.add(new Paddle(100, 10, SCREEN_WIDTH - 20, SCREEN_HEIGHT /2));
+        paddle1 = new Paddle(100, 10, 10, SCREEN_HEIGHT /2);
+        paddle2 = new Paddle(100, 10, SCREEN_WIDTH - 20, SCREEN_HEIGHT /2);
 
         float wallHeight = 10;
         walls.add(new Wall(wallHeight, SCREEN_WIDTH-20, 10, 0+wallHeight));
         walls.add(new Wall(wallHeight, SCREEN_WIDTH-20, 10, SCREEN_HEIGHT-wallHeight*2));
 
-        polygons.addAll(paddles);
+        polygons.add(paddle1);
+        polygons.add(paddle2);
         polygons.addAll(walls);
 
-        p1 = new Player(paddles.get(0), Input.Keys.W, Input.Keys.S);
-        p2 = new Player(paddles.get(1), Input.Keys.UP, Input.Keys.DOWN);
+        p1 = new Player(paddle1, Input.Keys.W, Input.Keys.S);
+        p2 = new Player(paddle2, Input.Keys.UP, Input.Keys.DOWN);
     }
 
     public int getScoreState() {
@@ -95,28 +96,27 @@ public class GdxPong extends ApplicationAdapter {
         batch.end();
 
         //Horribelt, jeg spyr, men det funker enn så lenge
+        //Hooribelt? watch this
         if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-            paddles.get(0).move(0,200 * Gdx.graphics.getDeltaTime());
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            paddles.get(0).move(0,-200 * Gdx.graphics.getDeltaTime());
+            if(paddle1.getY() < SCREEN_HEIGHT-paddle1.getHeight()) paddle1.move(0,200 * Gdx.graphics.getDeltaTime());
+        }else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+            if(paddle1.getY() > 0) paddle1.move(0,-200 * Gdx.graphics.getDeltaTime());
         }
         if(Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            paddles.get(1).move(0,200 * Gdx.graphics.getDeltaTime());
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            paddles.get(1).move(0,-200 * Gdx.graphics.getDeltaTime());
+            if(paddle2.getY() < SCREEN_HEIGHT-paddle1.getHeight()) paddle2.move(0,200 * Gdx.graphics.getDeltaTime());
+        }else if(Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+            if(paddle2.getY() > 0) paddle2.move(0,-200 * Gdx.graphics.getDeltaTime());
         }
 
         //:nauseated_face:
         switch (getScoreState()) {
             case 1:
                 p1.setScore(p1.getScore()+1);
-                ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10);
+                ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10, 200);
                 break;
             case 2:
                 p2.setScore(p2.getScore()+1);
-                ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10);
+                ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10, 200);
                 break;
             default:
                 break;

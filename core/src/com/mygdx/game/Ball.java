@@ -9,16 +9,16 @@ public class Ball extends Circle {
     private float xSpeed;
     private float ySpeed;
 
-    public Ball (float xSpawn, float ySpawn, float radius) {
+    public Ball (float xSpawn, float ySpawn, float radius, float speed) {
         super(xSpawn, ySpawn, radius);
 
         if (Math.random() > 0.5) {
-            this.xSpeed = 50;
+            this.xSpeed = speed;
         } else {
-            this.xSpeed = -50;
+            this.xSpeed = -speed;
         }
 
-        this.ySpeed = 200;
+        this.ySpeed = speed;
     }
 
     public float getxSpeed() {
