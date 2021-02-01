@@ -43,12 +43,12 @@ public class MyGdxGame extends ApplicationAdapter {
 
 			shapeRenderer = new ShapeRenderer();
 			batch = new SpriteBatch();
-			int amtCopters = 6;
+			int amtCopters = 4;
 			float splitX = SCREEN_WIDTH/amtCopters;
 			float splitY = SCREEN_HEIGHT/amtCopters;
 
 			for (int i = 0; i < amtCopters; i++) {
-				helis.add(new Helicopter(SCREEN_WIDTH, SCREEN_HEIGHT, splitX*(i+1)-100, splitY*(i+1)-100));
+				helis.add(new Helicopter(SCREEN_WIDTH, SCREEN_HEIGHT, splitX*(i), 150));
 			}
 		}
 
