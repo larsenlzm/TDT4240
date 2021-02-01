@@ -57,8 +57,8 @@ public class GdxPong extends ApplicationAdapter {
         paddle2 = new Paddle(100, 10, SCREEN_WIDTH - 20, SCREEN_HEIGHT /2);
 
         float wallHeight = 10;
-        walls.add(new Wall(wallHeight, SCREEN_WIDTH-20, 10, 0+wallHeight));
-        walls.add(new Wall(wallHeight, SCREEN_WIDTH-20, 10, SCREEN_HEIGHT-wallHeight*2));
+        walls.add(new Wall(wallHeight, SCREEN_WIDTH-40, 20, 0+wallHeight));
+        walls.add(new Wall(wallHeight, SCREEN_WIDTH-40, 20, SCREEN_HEIGHT-wallHeight*2));
 
         polygons.add(paddle1);
         polygons.add(paddle2);
@@ -112,6 +112,7 @@ public class GdxPong extends ApplicationAdapter {
         switch (getScoreState()) {
             case 1:
                 p1.setScore(p1.getScore()+1);
+
                 ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10, 200);
                 break;
             case 2:
