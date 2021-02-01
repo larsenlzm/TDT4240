@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
@@ -19,6 +20,13 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.ArrayList;
@@ -38,12 +46,39 @@ public class GdxPong extends ApplicationAdapter {
     private BitmapFont font;
     private float SCREEN_WIDTH;
     private float SCREEN_HEIGHT;
-
+    private String winText;
+    /*
+    private Skin mySkin;
+    private Stage stage;
+    private TextButton restartKnapp;
+    private TextButton.TextButtonStyle textButtonStyle;
+    private Skin skin;
+    private TextureAtlas buttonAtlas;
+   */
     @Override
     public void create() {
         SCREEN_WIDTH = Gdx.graphics.getWidth();
         SCREEN_HEIGHT = Gdx.graphics.getHeight();
 
+        winText = "";
+        /*
+        buttonAtlas = new TextureAtlas(Gdx.files.internal("button.pack"));
+        skin.addRegions(buttonAtlas);
+        textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.font = font;
+        textButtonStyle.up = skin.getDrawable("up-button");
+        textButtonStyle.down = skin.getDrawable("down-button");
+        textButtonStyle.checked = skin.getDrawable("checked-button");
+        restartKnapp = new TextButton("Button1", textButtonStyle);
+        restartKnapp.setSize(40,10);
+        restartKnapp.setPosition(10,Gdx.graphics.getHeight()-10*3);
+        restartKnapp.addListener(new InputListener(){
+            @Override
+            public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println("ferdig da, restart");
+            }
+        });
+        */
         shapeRenderer = new ShapeRenderer();
         batch = new SpriteBatch();
         font = new BitmapFont();
@@ -59,6 +94,8 @@ public class GdxPong extends ApplicationAdapter {
         float wallHeight = 10;
         walls.add(new Wall(wallHeight, SCREEN_WIDTH-40, 20, 0+wallHeight));
         walls.add(new Wall(wallHeight, SCREEN_WIDTH-40, 20, SCREEN_HEIGHT-wallHeight*2));
+
+
 
         polygons.add(paddle1);
         polygons.add(paddle2);
@@ -78,6 +115,17 @@ public class GdxPong extends ApplicationAdapter {
         }
     }
 
+
+    private void score(Player player, String name) {
+        if (player.getScore() < 11) {
+            player.setScore(player.getScore()+1);
+            ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10, 200);
+        } else if (player.getScore() == 11){
+            winText = "The winner is: " + name;
+                //TODO
+        }
+    }
+
     @Override
     public void render() {
         Gdx.gl.glClearColor(0, 0, 0, 1);
@@ -90,9 +138,12 @@ public class GdxPong extends ApplicationAdapter {
         shapeRenderer.circle(ball.x, ball.y, ball.radius);
         shapeRenderer.end();
 
+        //stage.draw();
+
         batch.begin();
         font.draw(batch, ""+p1.getScore(), (SCREEN_WIDTH/2)-50, SCREEN_HEIGHT-50);
         font.draw(batch, ""+p2.getScore(), (SCREEN_WIDTH/2)+50, SCREEN_HEIGHT-50);
+        font.draw(batch, winText, (SCREEN_WIDTH/2), SCREEN_HEIGHT/2);
         batch.end();
 
         //Horribelt, jeg spyr, men det funker enn så lenge
@@ -111,17 +162,13 @@ public class GdxPong extends ApplicationAdapter {
         //:nauseated_face:
         switch (getScoreState()) {
             case 1:
-                p1.setScore(p1.getScore()+1);
-
-                ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10, 200);
+                score(p1, "player2");
                 break;
             case 2:
-                p2.setScore(p2.getScore()+1);
-                ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10, 200);
+                score(p2, "player1");
                 break;
             default:
                 break;
-
         }
 
         //Ball til paddle/vegg kollisjon, flipper x eller y speed
@@ -138,7 +185,6 @@ public class GdxPong extends ApplicationAdapter {
 
 
     }
-
 
     @Override
     public void dispose() {
