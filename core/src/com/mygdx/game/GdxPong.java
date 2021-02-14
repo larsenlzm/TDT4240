@@ -47,6 +47,7 @@ public class GdxPong extends ApplicationAdapter {
     private float SCREEN_WIDTH;
     private float SCREEN_HEIGHT;
     private String winText;
+    private Stats stats;
     /*
     private Skin mySkin;
     private Stage stage;
@@ -59,6 +60,8 @@ public class GdxPong extends ApplicationAdapter {
     public void create() {
         SCREEN_WIDTH = Gdx.graphics.getWidth();
         SCREEN_HEIGHT = Gdx.graphics.getHeight();
+
+        stats = Stats.getInstance();
 
         winText = "";
         /*
@@ -116,11 +119,10 @@ public class GdxPong extends ApplicationAdapter {
     }
 
 
-    private void score(Player player, String name) {
-        if (player.getScore() < 11) {
-            player.setScore(player.getScore()+1);
+    private void score(int playerScore, String name) {
+        if (playerScore < 11) {
             ball = new Ball(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 10, 200);
-        } else if (player.getScore() == 11){
+        } else if (playerScore == 11){
             winText = "The winner is: " + name;
                 //TODO
         }
@@ -141,8 +143,8 @@ public class GdxPong extends ApplicationAdapter {
         //stage.draw();
 
         batch.begin();
-        font.draw(batch, ""+p1.getScore(), (SCREEN_WIDTH/2)-50, SCREEN_HEIGHT-50);
-        font.draw(batch, ""+p2.getScore(), (SCREEN_WIDTH/2)+50, SCREEN_HEIGHT-50);
+        font.draw(batch, ""+stats.getPlayerOneScore(), (SCREEN_WIDTH/2)-50, SCREEN_HEIGHT-50);
+        font.draw(batch, ""+stats.getPlayerTwoScore(), (SCREEN_WIDTH/2)+50, SCREEN_HEIGHT-50);
         font.draw(batch, winText, (SCREEN_WIDTH/2), SCREEN_HEIGHT/2);
         batch.end();
 
@@ -162,10 +164,12 @@ public class GdxPong extends ApplicationAdapter {
         //:nauseated_face:
         switch (getScoreState()) {
             case 1:
-                score(p1, "player2");
+                if (stats.getPlayerOneScore() < 11) stats.playerOneScores();
+                score(stats.getPlayerOneScore(), "player1");
                 break;
             case 2:
-                score(p2, "player1");
+                if (stats.getPlayerTwoScore() < 11) stats.playerTwoScores();
+                score(stats.getPlayerTwoScore(), "player2");
                 break;
             default:
                 break;
