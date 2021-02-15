@@ -1,6 +1,7 @@
 package com.mygdx.ecspong;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -10,13 +11,13 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.ecspong.components.CircleComponent;
 import com.mygdx.ecspong.components.PolygonComponent;
+import com.mygdx.ecspong.systems.RenderSystem;
 
 public class ECSPong extends ApplicationAdapter {
 
 	private float SCREEN_WIDTH;
 	private float SCREEN_HEIGHT;
-
-	private ShapeRenderer shapeRenderer;
+	private float stateTime;
 
 	private PooledEngine engine;
 
@@ -27,15 +28,17 @@ public class ECSPong extends ApplicationAdapter {
 	private Entity wallBottom;
 
 	private Entity ball;
+
+	private EntitySystem renderSystem;
 	
 	@Override
 	public void create () {
 		SCREEN_WIDTH = Gdx.graphics.getWidth();
 		SCREEN_HEIGHT = Gdx.graphics.getHeight();
 
-		shapeRenderer = new ShapeRenderer();
-
 		engine = new PooledEngine();
+		renderSystem = new RenderSystem();
+		engine.addSystem(renderSystem);
 
 		//engine.addSystem(new MovementSystem());
 
@@ -57,21 +60,13 @@ public class ECSPong extends ApplicationAdapter {
 	}
 
 	@Override
-	public void render () {
+	public void render() {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-		shapeRenderer.polygon(wallTop.getComponent(PolygonComponent.class).bounds.getTransformedVertices());
-		shapeRenderer.polygon(wallBottom.getComponent(PolygonComponent.class).bounds.getTransformedVertices());
-		Circle ballBounds = ball.getComponent(CircleComponent.class).bounds;
-		shapeRenderer.circle(ballBounds.x, ballBounds.y, ballBounds.radius);
-		shapeRenderer.end();
+		stateTime = Gdx.graphics.getDeltaTime();
+		engine.update(stateTime);
 
 	}
-	
-	@Override
-	public void dispose () {
-		shapeRenderer.dispose();
-	}
+
 }

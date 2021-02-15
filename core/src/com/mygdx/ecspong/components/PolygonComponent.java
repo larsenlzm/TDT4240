@@ -16,4 +16,8 @@ public class PolygonComponent implements Component {
         bounds.setPosition(pos.x, pos.y);
         return this;
     }
+
+    public Polygon getBounds() {
+        return bounds;
+    }
 }
