@@ -23,7 +23,7 @@ Both are recurring solutions to a recurring problem, but the difference is in th
 
 Pretty much all of the code is refactored to make this pattern. This is an architectural pattern and therefore affects the whole architecture of the program. Our earlier solution had the render function from libgdx handle almost everything, but this is now sorted by our created systems, like GameSystem and RenderSystem.
 
-in the task4+singlton branch you see a implementation of the singleton pattern. in the stat.java you see a singleton class with the static stat instance that can be accesed but not created again.
+In the task4+singlton branch you see a implementation of the singleton pattern. in the Stat.java you see a singleton class with the static stat instance that can be accesed but not created again. You can access the instance anywhere cause its public.
 
 **c) Is there any advantages in using this pattern in this program? (What are the advantages/disadvantages?)**
 
