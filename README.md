@@ -23,6 +23,8 @@ Both are recurring solutions to a recurring problem, but the difference is in th
 
 Pretty much all of the code is refactored to make this pattern. This is an architectural pattern and therefore affects the whole architecture of the program. Our earlier solution had the render function from libgdx handle almost everything, but this is now sorted by our created systems, like GameSystem and RenderSystem.
 
+in the task4+singlton branch you see a implementation of the singleton pattern. in the stat.java you see a singleton class with the static stat instance that can be accesed but not created again.
+
 **c) Is there any advantages in using this pattern in this program? (What are the advantages/disadvantages?)**
 
 Advantages to using the Entity Component System are that it's easy and fast to set up, not very complex. Also makes it really easy to extend features to the system. It also helps in dividing your classes. Its really fast on runtime and better structured in the memory
