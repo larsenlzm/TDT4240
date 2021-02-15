@@ -20,4 +20,8 @@ public class PolygonComponent implements Component {
     public Vector2 getPos() {
         return new Vector2(bounds.getX(), bounds.getY());
     }
+
+    public Polygon getBounds() {
+        return bounds;
+    }
 }
