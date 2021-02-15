@@ -5,16 +5,11 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Polygon;
-import com.badlogic.gdx.utils.Array;
 import com.mygdx.ecspong.components.CircleComponent;
 import com.mygdx.ecspong.components.PolygonComponent;
-import com.mygdx.ecspong.components.PositionComponent;
 import com.badlogic.ashley.core.Engine;
 
 public class RenderSystem extends EntitySystem {
