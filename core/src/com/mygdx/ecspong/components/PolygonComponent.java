@@ -12,8 +12,12 @@ public class PolygonComponent implements Component {
         return this;
     }
 
-    public PolygonComponent set(Vector2 pos) {
+    public PolygonComponent setPos(Vector2 pos) {
         bounds.setPosition(pos.x, pos.y);
         return this;
+    }
+
+    public Vector2 getPos() {
+        return new Vector2(bounds.getX(), bounds.getY());
     }
 }

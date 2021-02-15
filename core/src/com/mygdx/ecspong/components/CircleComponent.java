@@ -12,8 +12,12 @@ public class CircleComponent implements Component {
         return this;
     }
 
-    public CircleComponent set(Vector2 pos) {
+    public CircleComponent setPos(Vector2 pos) {
         bounds.setPosition(pos);
         return this;
+    }
+
+    public Vector2 getPos() {
+        return new Vector2(bounds.x, bounds.y);
     }
 }
