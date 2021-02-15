@@ -6,9 +6,13 @@ import com.badlogic.gdx.math.Vector2;
 
 public class PolygonComponent implements Component {
     public Polygon bounds = new Polygon();
+    public float width;
+    public float height;
 
     public PolygonComponent create(float width, float height) {
         this.bounds = new Polygon(new float[]{0, 0, width, 0, width, height, 0, height});
+        this.width = width;
+        this.height = height;
         return this;
     }
 

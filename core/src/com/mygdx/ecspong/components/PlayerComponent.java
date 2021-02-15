@@ -6,10 +6,12 @@ public class PlayerComponent implements Component {
     public int upKey;
     public int downKey;
     public int score;
+    public int playerNum;
 
-    public PlayerComponent create(int upKey, int downKey) {
+    public PlayerComponent create(int upKey, int downKey, int playerNum) {
         this.downKey = downKey;
         this.upKey = upKey;
+        this.playerNum = playerNum;
         return this;
     }
 
